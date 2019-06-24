@@ -3,7 +3,6 @@ package view;
 import javax.swing.*;
 import java.awt.*;
 
-
 public class application extends JFrame{
 
     private JButton PreviousButton;
@@ -34,9 +33,16 @@ public class application extends JFrame{
     public boolean random;
     public boolean loop;
     public boolean SliderIsZero;
+    public application() {
 
+        muted = false;
+        random = false;
+        loop = false;
+        SliderIsZero = false;
+        initializeView();
+    }
 
-public void initializeView() {
+    public void initializeView() {
 
         frame = new JFrame();
         frame.getContentPane().setBackground(new Color(204, 204, 204));
@@ -263,4 +269,89 @@ public void initializeView() {
 
     }
 
+    public JButton getPreviousButton()
+    {
+        return PreviousButton;
+    }
+
+    public JButton getNextButton() {
+        return NextButton;
+    }
+
+    public JButton getRandomPlayButton() {
+        return RandomPlayButton;
+    }
+
+    public JButton getLoopButton() {
+        return LoopButton;
+    }
+
+    public JButton getChooseDirectoryButton() {
+        return ChooseDirectoryButton;
+    }
+
+    public JButton getFavouritesButton() {
+        return FavouritesButton;
+    }
+
+    public JButton getAboutButton() {
+        return AboutButton;
+    }
+
+    public JButton getSettingsButton() {
+        return SettingsButton;
+    }
+
+    public JButton getPlaylistsButton() {
+        return PlaylistsButton;
+    }
+
+    public JButton getRecentButton() {
+        return RecentButton;
+    }
+
+    public JButton getHelpButton() {
+        return HelpButton;
+    }
+
+    public JButton getAlbumsButton() {
+        return AlbumsButton;
+    }
+
+    public JButton getPlayButton() {
+        return PlayButton;
+    }
+
+    public JButton getPreviousScreenButton() {
+        return previousScreenButton;
+    }
+
+    public JButton getNextScreenButton() {
+        return nextScreenButton;
+    }
+
+    public JButton getSpeakerButton() {
+        return SpeakerButton;
+    }
+
+    public JSlider getSlider() {
+        return slider;
+    }
+
+    public JProgressBar getProgressBar()
+    {
+        return progressBar;
+    }
+
+    public JLabel getHelpLabel() {
+        return HelpLabel;
+    }
+
+    public JLabel getAboutLabel() {
+        return AboutLabel;
+    }
+
+    public JLabel getSongTitleLabel() {
+        return SongTitleLabel;
+    }
 }

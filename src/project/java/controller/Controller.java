@@ -8,11 +8,39 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
 
     public Controller() throws Exception {
 
-
-        this.GUI = new application();
+		this.GUI = new application();
         this.GUI.frame.setVisible(true);
         playlistsContainer = new PlaylistsContainer();
+        buttonsFactory = new ButtonsFactory();
+        buttons = buttonsFactory.createButtons(15);
+        for (JButton b : buttons)
+            GUI.frame.getContentPane().add(b);
+
+
         this.addActionListeners();
+        load_player("H:\\JAVA\\OdtwarzaczDlaUbogich\\arrival.mp3");
+        Thread thread = new Thread()
+        {
+            public void run() {
+                while (true)
+                {
+                    if(isPlaying && !loop)
+                    {
+                        if(utils.getCurrentTime() == utils.getSongTime())
+                        {
+                            try {
+                                chooseSong(true);
+                                playButtonAction();
+                                playButtonAction();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        thread.start();
     }
 	private void addActionListeners() {
         GUI.getPreviousButton().addActionListener(this);
@@ -224,6 +252,16 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
             playlist = new Playlist();
             files = new ArrayList<File>(Arrays.asList(directory.listFiles()));
             ListIterator listIterator=files.listIterator();
+
+            for(File file:files)
+                playlist.loadSongs(listIterator.next().toString());
+
+            String playlistName = JOptionPane.showInputDialog("Please write playlist name!");
+            playlistsContainer.addPlaylist(playlist, playlistName);
+            view();
+            File plik = new File(playlistName);
+            utils.loadSong(playlistsContainer.getPlaylist(currentPlaylist).getSong( index).getFile());
+
 
         } else {
             System.out.println("No Selection ");

@@ -4,15 +4,84 @@ package controller;
 
 public class Controller implements ActionListener, ChangeListener, MouseMotionListener, MouseListener {
 
-    private ButtonsFactory buttonsFactory;
+    private boolean RecentView = false;
+    private boolean FavouritesView = false;
+    private boolean PlaylistsView = true;
+    private boolean PlaylistsSongView = false;
+    private boolean AlbumsView = false;
+    private boolean chooseTrack = false;
+    private int card = 0;
+    private int SongIndex;
+    private int currentPlaylist = 0;
+    private int  index = 0;
+    private Playlist playlist;
+    private volatile boolean isPlaying = false;
+    private boolean HelpLabel = false;
+    private boolean AboutLabel = false;
+    private boolean muted = false;
+    private boolean isRandom = false;
+    private boolean loop = false;
+    private int mousePossition;
+    private boolean SliderIsZero = false;
+    private String bootDirectoryName = "D:\\OdtwarzaczDlaUbogich\\arrival.mp3";
+    private application GUI;
+    private File directory;
+    private ArrayList<File> files;
+    private ArrayList<JButton> buttons;
+    private PlaylistsContainer playlistsContainer;
+    private Thread thread;
+    private FileController file;
+	private ButtonsFactory buttonsFactory;
 
     public Controller() throws Exception {
 
-
-        this.GUI = new application();
+		 this.GUI = new application();
         this.GUI.frame.setVisible(true);
         playlistsContainer = new PlaylistsContainer();
+        buttonsFactory = new ButtonsFactory();
+        buttons = buttonsFactory.createButtons(15);
+        for (JButton b : buttons)
+            GUI.frame.getContentPane().add(b);
+
+
         this.addActionListeners();
+        load_player("H:\\JAVA\\OdtwarzaczDlaUbogich\\arrival.mp3");
+        Thread thread = new Thread()
+        {
+            public void run() {
+                while (true)
+                {
+                    if(isPlaying && !loop)
+                    {
+                        if(utils.getCurrentTime() == utils.getSongTime())
+                        {
+                            try {
+                                chooseSong(true);
+                                playButtonAction();
+                                playButtonAction();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        thread.start();
+        file = new FileController("H:\\JAVA\\OdtwarzaczDlaUbogich\\test.txt");
+        file.fileRead();
+        for(int i=0;i<=file.getFileContent().size()/2;i+=2)
+        {
+            File temp = new File(file.getFileContent().get(i+1));
+            files = new ArrayList<File>(Arrays.asList(temp.listFiles()));
+            ListIterator listIterator = files.listIterator();
+            playlist = new Playlist();
+            for(File f:files)
+                playlist.loadSongs(listIterator.next().toString());
+
+            playlistsContainer.addPlaylist(playlist, file.getFileContent().get(i));
+            view();
+        }
     }
 	private void addActionListeners() {
         GUI.getPreviousButton().addActionListener(this);
@@ -224,6 +293,17 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
             playlist = new Playlist();
             files = new ArrayList<File>(Arrays.asList(directory.listFiles()));
             ListIterator listIterator=files.listIterator();
+
+            for(File file:files)
+                playlist.loadSongs(listIterator.next().toString());
+
+            String playlistName = JOptionPane.showInputDialog("Please write playlist name!");
+            file.fileAppend(playlistName,directory.toString());
+            playlistsContainer.addPlaylist(playlist, playlistName);
+            view();
+            File plik = new File(playlistName);
+            utils.loadSong(playlistsContainer.getPlaylist(currentPlaylist).getSong( index).getFile());
+
 
         } else {
             System.out.println("No Selection ");

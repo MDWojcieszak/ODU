@@ -11,7 +11,7 @@ public class ButtonsFactory implements view.AbstractFactory<JButton>
     }
 
     @Override
-    public Set<JButton> createButtons(int n)
+    public ArrayList<JButton> createButtons(int n)
     {
         if(n>15)
             n=15;

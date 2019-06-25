@@ -229,6 +229,23 @@ public class application extends JFrame{
             HelpButton.setBounds(60, 154, 140, 25);
             frame.getContentPane().add(HelpButton);
         }
+        LastAddedPlaylistButton = new JButton("LastAddedPlaylist");
+        {
+            HelpButton.setBounds(60, 184, 140, 25);
+            frame.getContentPane().add(HelpButton);
+        }
+        
+        favoritePlaylistButton = new JButton("favoritePlaylist");
+        {
+            HelpButton.setBounds(60, 204, 140, 25);
+            frame.getContentPane().add(HelpButton);
+        }
+        RecentPlaylistButton = new JButton("RecentPlaylist");
+        {
+            HelpButton.setBounds(60, 224, 140, 25);
+            frame.getContentPane().add(HelpButton);
+        }
+
 
         AlbumsButton = new JButton("Albums");
         {

@@ -1,5 +1,16 @@
 package controller;
-
+import controller.FileController;
+import javafx.application.Platform;
+import view.application;
+import model.PlaylistsContainer;
+import view.ButtonsFactory;
+import model.Playlist;
+import java.awt.event.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.*;
+import java.util.*;
+import java.io.File;
 
 
 public class Controller implements ActionListener, ChangeListener, MouseMotionListener, MouseListener {

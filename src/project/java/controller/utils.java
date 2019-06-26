@@ -11,6 +11,7 @@ public class utils {
 
     private static MediaPlayer player;
     private static Media media;
+    private static String fileNameVariable;
     public static void inicialize_player(String fileName)
     {
         File file = new File(fileName.replace('\\', '/'));
@@ -39,7 +40,7 @@ public class utils {
         Runnable r = new Runnable() {
             @Override
             public void run() {
-
+                fileNameVariable = fileName;
                 inicialize_player(fileName);
                 return;
             }
@@ -77,5 +78,9 @@ public class utils {
     public static  void setStart()
     {
         player.seek(Duration.millis(0));
+    }
+    public static String getFileName()
+    {
+        return fileNameVariable;
     }
 }

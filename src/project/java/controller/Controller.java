@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 package controller;
 import controller.FileController;
 import javafx.application.Platform;
@@ -6,10 +5,13 @@ import view.application;
 import model.PlaylistsContainer;
 import view.ButtonsFactory;
 import model.Playlist;
+
+import java.awt.*;
 import java.awt.event.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.*;
+import java.security.Guard;
 import java.util.*;
 import java.io.File;
 
@@ -19,17 +21,16 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
     private boolean RecentView = false;
     private boolean FavouritesView = false;
     private boolean PlaylistsView = true;
-    private boolean PlaylistsSongView = false;
     private boolean AlbumsView = false;
+    private boolean PlaylistsSongView = false;
     private boolean chooseTrack = false;
     private int card = 0;
-    private int SongIndex;
-    private int currentPlaylist = 0;
+    private int currentPlaylist = 2;
     private int  index = 0;
     private Playlist playlist;
+    private Playlist favorite;
+    private Playlist recent;
     private volatile boolean isPlaying = false;
-    private boolean HelpLabel = false;
-    private boolean AboutLabel = false;
     private boolean muted = false;
     private boolean isRandom = false;
     private boolean loop = false;
@@ -40,20 +41,10 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
     private File directory;
     private ArrayList<File> files;
     private ArrayList<JButton> buttons;
+    private ArrayList<JButton> likeButtons;
     private PlaylistsContainer playlistsContainer;
     private Thread thread;
     private FileController file;
-
-
-    public File getDirectory() {
-        return directory;
-    }
-
-    public void setDirectory(File directory) {
-        this.directory = directory;
-    }
-
-
     private ButtonsFactory buttonsFactory;
 
     public Controller() throws Exception {
@@ -63,7 +54,15 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
         this.GUI.frame.setVisible(true);
         playlistsContainer = new PlaylistsContainer();
         buttonsFactory = new ButtonsFactory();
-        buttons = buttonsFactory.createButtons(15);
+        likeButtons = buttonsFactory.createButtons(15,757, 23);
+        buttons = buttonsFactory.createButtons(15, 231, 524);
+
+        for (JButton b: likeButtons)
+            GUI.frame.getContentPane().add(b);
+        favorite = new Playlist();
+        recent = new Playlist();
+        playlistsContainer.addPlaylist(favorite,"favorite");
+        playlistsContainer.addPlaylist(recent, "recent");
         for (JButton b : buttons)
             GUI.frame.getContentPane().add(b);
 
@@ -73,8 +72,19 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
         Thread thread = new Thread()
         {
             public void run() {
+                int previous = -1;
                 while (true)
                 {
+                    if(index != previous)
+
+                        if(recent.getCount()>15)
+                        {
+
+                        }
+                        else
+                        {
+
+                        }
                     if(isPlaying && !loop)
                     {
                         if(utils.getCurrentTime() == utils.getSongTime())
@@ -104,7 +114,7 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
                 playlist.loadSongs(listIterator.next().toString());
 
             playlistsContainer.addPlaylist(playlist, file.getFileContent().get(i));
-            view();
+            view("PlaylistsView");
         }
     }
 
@@ -129,6 +139,8 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
         GUI.getProgressBar().addMouseMotionListener(this);
         GUI.getProgressBar().addMouseListener(this);
         for (JButton b : buttons)
+            b.addActionListener(this);
+        for(JButton b : likeButtons)
             b.addActionListener(this);
     }
 
@@ -283,62 +295,171 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
                 }
             }
         }
+        for (int i = 0; i < 15; i++) {
+            if ((((JButton) e.getSource()) == likeButtons.get(i))) {
+                try {
+                    likeButtonAction(i);
+                } catch (Exception ex) {
+                    System.out.println(ex);
+                }
+            }
+        }
 
     }
+    private void check(int i)
+    {
+        boolean change = false;
+        for(int j = 0; j<favorite.getCount(); j++)
+        {
+            if(favorite.getSong(j).getFile() ==
+                    playlistsContainer.getPlaylist(currentPlaylist).getSong(i + card * 15).getFile())
+            {
+                likeButtons.get(i).setIcon(new ImageIcon("src\\project\\java\\pictures\\yFavorites.png"));
+                change = true;
+            }
+        }
+        if(!change)
+            likeButtons.get(i).setIcon(new ImageIcon("src\\project\\java\\pictures\\noFavorites.png"));
+    }
 
-    private void view() {
-        if (RecentView) {
-
-        } else if (FavouritesView) {
-
-        } else if (PlaylistsView) {
-            if (PlaylistsSongView) {
-                chooseTrack = true;
-                if (playlistsContainer.getPlaylist(currentPlaylist).getCount() / 15 > 0)
+    private void view(String view) {
+        switch (view)
+        {
+            case "RecentView":
+                for (int i = 0; i <15; i++) {
+                    buttons.get(i).setVisible(true);
+                    buttons.get(i).setText(getSongnameFromPath(
+                            recent.getSong(i+card*15).getFile()));
+                    likeButtons.get(i).setVisible(false);
+                    GUI.getPreviousScreenButton().setVisible(false);
+                    GUI.getNextScreenButton().setVisible(false);
+                }
+                break;
+            case "FavoritesView":
+                if (favorite.getCount() / 15 > 0)
                 {
-                    if(card<playlistsContainer.getPlaylist(currentPlaylist).getCount() / 15)
+                    GUI.getPreviousScreenButton().setVisible(true);
+                    GUI.getNextScreenButton().setVisible(true);
+                    if(card < favorite.getCount() / 15)
                     {
                         for (int i = 0; i <15; i++) {
                             buttons.get(i).setVisible(true);
                             buttons.get(i).setText(getSongnameFromPath(
-                                    playlistsContainer.getPlaylist(currentPlaylist).getSong(i+card*15).getFile()));
+                                    favorite.getSong(i+card*15).getFile()));
+                            likeButtons.get(i).setVisible(true);
+                            likeButtons.get(i).setIcon(new ImageIcon("src\\project\\java\\pictures\\yFavorites.png"));
                         }
                     }
                     else
                     {
-                        for (int i = 0; i < playlistsContainer.getPlaylist(currentPlaylist).getCount()-card*15; i++) {
+                        for (int i = 0; i < favorite.getCount()-card*15; i++) {
                             buttons.get(i).setVisible(true);
                             buttons.get(i).setText(getSongnameFromPath(
-                                    playlistsContainer.getPlaylist(currentPlaylist).getSong(i+card*15).getFile()));
+                                    favorite.getSong(i+card*15).getFile()));
+                            likeButtons.get(i).setVisible(true);
+                            likeButtons.get(i).setIcon(new ImageIcon("src\\project\\java\\pictures\\yFavorites.png"));
                         }
-                        for (int i =14; i >= playlistsContainer.getPlaylist(currentPlaylist).getCount()-card*15; i--) {
+                        for (int i =14; i >= favorite.getCount()-card*15; i--) {
                             buttons.get(i).setVisible(false);
+                            likeButtons.get(i).setVisible(false);
                         }
                     }
-
                 }
                 else {
-                    for (int i = 0; i < playlistsContainer.getPlaylist(currentPlaylist).getCount(); i++) {
+                    GUI.getPreviousScreenButton().setVisible(false);
+                    GUI.getNextScreenButton().setVisible(false);
+                    for (int i = 0; i < favorite.getCount(); i++) {
                         buttons.get(i).setVisible(true);
                         buttons.get(i).setText(getSongnameFromPath(
-                                playlistsContainer.getPlaylist(currentPlaylist).getSong(i).getFile()));
+                                favorite.getSong(i).getFile()));
+                        likeButtons.get(i).setVisible(true);
+                        likeButtons.get(i).setIcon(new ImageIcon("src\\project\\java\\pictures\\yFavorites.png"));
                     }
-                    for (int i = 14; i >= playlistsContainer.getPlaylist(currentPlaylist).getCount(); i--) {
+                    for (int i = 14; i >= favorite.getCount(); i--) {
                         buttons.get(i).setVisible(false);
+                        likeButtons.get(i).setVisible(false);
                     }
                 }
-            } else {
-                chooseTrack = false;
-                for (int i = 0; i < playlistsContainer.getNumberOfPlaylists(); i++) {
-                    buttons.get(i).setVisible(true);
-                    buttons.get(i).setText(playlistsContainer.getPlaylistName(i));
-                }
-                for (int i = 14; i >= playlistsContainer.getNumberOfPlaylists(); i--) {
-                    buttons.get(i).setVisible(false);
-                }
-            }
-        } else if (AlbumsView) {
+                break;
+            case "PlaylistsView":
+                GUI.getHelpLabel().setVisible(false);
+                GUI.getAboutLabel().setVisible(false);
+                GUI.getPreviousScreenButton().setVisible(true);
+                GUI.getNextScreenButton().setVisible(true);
+                if (PlaylistsSongView) {
+                    chooseTrack = true;
+                    if (playlistsContainer.getPlaylist(currentPlaylist).getCount() / 15 > 0)
+                    {
+                        if(card<playlistsContainer.getPlaylist(currentPlaylist).getCount() / 15)
+                        {
+                            for (int i = 0; i <15; i++) {
+                                buttons.get(i).setVisible(true);
+                                buttons.get(i).setText(getSongnameFromPath(
+                                        playlistsContainer.getPlaylist(currentPlaylist).getSong(i+card*15).getFile()));
+                                likeButtons.get(i).setVisible(true);
+                                check(i);
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < playlistsContainer.getPlaylist(currentPlaylist).getCount()-card*15; i++) {
+                                buttons.get(i).setVisible(true);
+                                buttons.get(i).setText(getSongnameFromPath(
+                                        playlistsContainer.getPlaylist(currentPlaylist).getSong(i+card*15).getFile()));
+                                likeButtons.get(i).setVisible(true);
+                                check(i);
+                            }
+                            for (int i =14; i >= playlistsContainer.getPlaylist(currentPlaylist).getCount()-card*15; i--) {
+                                buttons.get(i).setVisible(false);
+                                likeButtons.get(i).setVisible(false);
+                            }
+                        }
 
+                    }
+                    else {
+                        for (int i = 0; i < playlistsContainer.getPlaylist(currentPlaylist).getCount(); i++) {
+                            buttons.get(i).setVisible(true);
+                            buttons.get(i).setText(getSongnameFromPath(
+                                    playlistsContainer.getPlaylist(currentPlaylist).getSong(i).getFile()));
+                            likeButtons.get(i).setVisible(true);
+                            check(i);
+                        }
+                        for (int i = 14; i >= playlistsContainer.getPlaylist(currentPlaylist).getCount(); i--) {
+                            buttons.get(i).setVisible(false);
+                            likeButtons.get(i).setVisible(false);
+                        }
+                    }
+                } else {
+                    chooseTrack = false;
+                    for (int i = 0; i < playlistsContainer.getNumberOfPlaylists()-2; i++) {
+                        buttons.get(i).setVisible(true);
+                        buttons.get(i).setText(playlistsContainer.getPlaylistName(i+2));
+                        likeButtons.get(i).setVisible(false);
+                    }
+                    for (int i = 14; i >= playlistsContainer.getNumberOfPlaylists()-2; i--) {
+                        buttons.get(i).setVisible(false);
+                        likeButtons.get(i).setVisible(false);
+                    }
+                }
+                break;
+            case "AlbumsView":
+                break;
+            case "HelpLabel":
+                GUI.getHelpLabel().setVisible(true);
+                GUI.getAboutLabel().setVisible(false);
+                GUI.getPreviousScreenButton().setVisible(false);
+                GUI.getNextScreenButton().setVisible(false);
+                for (JButton b : buttons)
+                    b.setVisible(false);
+                break;
+            case "AboutLable":
+                GUI.getHelpLabel().setVisible(false);
+                GUI.getAboutLabel().setVisible(true);
+                GUI.getPreviousScreenButton().setVisible(false);
+                GUI.getNextScreenButton().setVisible(false);
+                for (JButton b : buttons)
+                    b.setVisible(false);
+                break;
         }
     }
 
@@ -362,6 +483,14 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
         if (RecentView) {
 
         } else if (FavouritesView) {
+            currentPlaylist = 0;
+            index = button + card * 15;
+            System.out.println( index);
+            if (isPlaying) {
+                playButtonAction();
+            }
+            utils.loadSong(favorite.getSong( index).getFile());
+            if (!isPlaying) playButtonAction();
 
         } else if (PlaylistsView) {
             PlaylistsSongView = true;
@@ -376,14 +505,40 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
 
             } else {
                 card=0;
-                currentPlaylist = button;
+                currentPlaylist = button+2;
             }
 
-            view();
+            view("PlaylistsView");
         } else if (AlbumsView) {
 
         }
     }
+
+    private void likeButtonAction(int index)
+    {
+        if(FavouritesView)
+        {
+            favorite.removeSong(index + card*15);
+            view("FavoritesView");
+        }
+        else {
+            int favoriteSongIndex = -1;
+            for (int i = 0; i < favorite.getCount(); i++) {
+                if (favorite.getSong(i).getFile() ==
+                        playlistsContainer.getPlaylist(currentPlaylist).getSong(index + card * 15).getFile()) {
+                    favoriteSongIndex = i;
+                    likeButtons.get(index).setIcon(new ImageIcon("src\\project\\java\\pictures\\noFavorites.png"));
+                }
+            }
+            if (favoriteSongIndex == -1) {
+                likeButtons.get(index).setIcon(new ImageIcon("src\\project\\java\\pictures\\yFavorites.png"));
+                favorite.loadSongs(playlistsContainer.getPlaylist(currentPlaylist).getSong(index + card * 15).getFile());
+            } else {
+                favorite.removeSong(favoriteSongIndex);
+            }
+        }
+    }
+
     private static int getRandomNumberInRange(int min, int max) {
 
         if (min >= max) {
@@ -424,7 +579,6 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
         utils.loadSong(playlistsContainer.getPlaylist(currentPlaylist).getSong( index).getFile());
 
     }
-
 
     private void previousButtonAction() throws Exception {
         if (utils.getCurrentTime() > 2000) {
@@ -512,7 +666,7 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
             String playlistName = JOptionPane.showInputDialog("Please write playlist name!");
             file.fileAppend(playlistName,directory.toString());
             playlistsContainer.addPlaylist(playlist, playlistName);
-            view();
+            view("PlaylistsView");
             File plik = new File(playlistName);
             utils.loadSong(playlistsContainer.getPlaylist(currentPlaylist).getSong( index).getFile());
 
@@ -524,82 +678,47 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
     }
 
     private void favouritesButtonAction() throws Exception {
-        RecentView = false;
+        card = 0;
         FavouritesView = true;
         PlaylistsView = false;
-        AlbumsView = false;
-        view();
+        view("FavoritesView");
     }
 
     private void aboutButtonAction() throws Exception {
-        if (!AboutLabel) {
-            AboutLabel = true;
-            GUI.getAboutLabel().setVisible(true);
-            GUI.getHelpLabel().setVisible(false);
-            GUI.getPreviousScreenButton().setVisible(false);
-            GUI.getNextScreenButton().setVisible(false);
-            for (JButton b : buttons)
-                b.setVisible(false);
-        } else {
-            AboutLabel = false;
-            GUI.getAboutLabel().setVisible(false);
-            GUI.getPreviousScreenButton().setVisible(true);
-            GUI.getNextScreenButton().setVisible(true);
-        }
+        view("AboutLable");
     }
 
     private void settingsButtonAction() throws Exception {
-        System.out.println("Działa");
+        view("SettingsView");
     }
 
     private void playlistsButtonAction() throws Exception {
-        RecentView = false;
         FavouritesView = false;
-        PlaylistsView = true;
-        AlbumsView = false;
         PlaylistsSongView = false;
-        view();
+        PlaylistsView = true;
+        view("PlaylistsView");
     }
 
     private void recentButtonAction() throws Exception {
-        RecentView = true;
-        FavouritesView = false;
-        PlaylistsView = false;
-        AlbumsView = false;
-        view();
+        if(RecentView) RecentView = false;
+        else RecentView = true;
+        view("RecentView");
     }
 
     private void helpButtonAction() throws Exception {
-        if (!HelpLabel) {
-            HelpLabel = true;
-            GUI.getHelpLabel().setVisible(true);
-            GUI.getAboutLabel().setVisible(false);
-            GUI.getPreviousScreenButton().setVisible(false);
-            GUI.getPreviousScreenButton().setVisible(false);
-            GUI.getNextScreenButton().setVisible(false);
-            for (JButton b : buttons)
-                b.setVisible(false);
-
-        } else {
-            HelpLabel = false;
-            GUI.getHelpLabel().setVisible(false);
-            GUI.getPreviousScreenButton().setVisible(true);
-            GUI.getNextScreenButton().setVisible(true);
-        }
+        view("HelpLabel");
     }
 
     private void albumsButtonAction() throws Exception {
-        RecentView = true;
-        FavouritesView = false;
-        PlaylistsView = false;
-        AlbumsView = false;
-        view();
+        if(AlbumsView) AlbumsView = false;
+        else AlbumsView = true;
+        view("AlbumView");
     }
 
     private void playButtonAction() throws Exception {
 
         if (!isPlaying) {
-            GUI.getSongTitleLabel().setText(getSongnameFromPath(playlistsContainer.getPlaylist(currentPlaylist).getSong( index).getFile()));
+            GUI.getSongTitleLabel().setText(getSongnameFromPath(utils.getFileName()));
             utils.startSound();
             utils.setVolume((double) GUI.getSlider().getValue() / 100);
             isPlaying = true;
@@ -627,14 +746,20 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
     private void previousScreenButtonAction() throws Exception {
         if(card!=0)
         card--;
-        view();
+        if(PlaylistsView)
+            view("PlaylistsView");
+        else if (FavouritesView)
+            view("FavoritesView");
     }
 
     private void nextScreenButtonAction() throws Exception {
 
         if(!(card >= playlistsContainer.getPlaylist(currentPlaylist).getCount() / 15))
             card++;
-        view();
+        if(PlaylistsView)
+            view("PlaylistsView");
+        else if (FavouritesView)
+            view("FavoritesView");
     }
 
     private void speakerButtonAction() throws Exception {
@@ -692,405 +817,3 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
 
     }
 }
-=======
-package controller;
-import controller.FileController;
-import javafx.application.Platform;
-import view.application;
-import model.PlaylistsContainer;
-import view.ButtonsFactory;
-import model.Playlist;
-import java.awt.event.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.*;
-import java.util.*;
-import java.io.File;
-
-
-public class Controller implements ActionListener, ChangeListener, MouseMotionListener, MouseListener {
-
-    private boolean RecentView = false;
-    private boolean FavouritesView = false;
-    private boolean PlaylistsView = true;
-    private boolean PlaylistsSongView = false;
-    private boolean AlbumsView = false;
-    private boolean chooseTrack = false;
-    private int card = 0;
-    private int SongIndex;
-    private int currentPlaylist = 0;
-    private int  index = 0;
-    private Playlist playlist;
-    private volatile boolean isPlaying = false;
-    private boolean HelpLabel = false;
-    private boolean AboutLabel = false;
-    private boolean muted = false;
-    private boolean isRandom = false;
-    private boolean loop = false;
-    private int mousePossition;
-    private boolean SliderIsZero = false;
-    private String bootDirectoryName = "D:\\OdtwarzaczDlaUbogich\\arrival.mp3";
-    private application GUI;
-    private File directory;
-    private ArrayList<File> files;
-    private ArrayList<JButton> buttons;
-    private PlaylistsContainer playlistsContainer;
-    private Thread thread;
-    private FileController file;
-	private ButtonsFactory buttonsFactory;
-
-    public Controller() throws Exception {
-
-		 this.GUI = new application();
-        this.GUI.frame.setVisible(true);
-        playlistsContainer = new PlaylistsContainer();
-        buttonsFactory = new ButtonsFactory();
-        buttons = buttonsFactory.createButtons(15);
-        for (JButton b : buttons)
-            GUI.frame.getContentPane().add(b);
-
-
-        this.addActionListeners();
-        load_player("H:\\JAVA\\OdtwarzaczDlaUbogich\\arrival.mp3");
-        Thread thread = new Thread()
-        {
-            public void run() {
-                while (true)
-                {
-                    if(isPlaying && !loop)
-                    {
-                        if(utils.getCurrentTime() == utils.getSongTime())
-                        {
-                            try {
-                                chooseSong(true);
-                                playButtonAction();
-                                playButtonAction();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-            }
-        };
-        thread.start();
-        file = new FileController("H:\\JAVA\\OdtwarzaczDlaUbogich\\test.txt");
-        file.fileRead();
-        for(int i=0;i<=file.getFileContent().size()/2;i+=2)
-        {
-            File temp = new File(file.getFileContent().get(i+1));
-            files = new ArrayList<File>(Arrays.asList(temp.listFiles()));
-            ListIterator listIterator = files.listIterator();
-            playlist = new Playlist();
-            for(File f:files)
-                playlist.loadSongs(listIterator.next().toString());
-
-            playlistsContainer.addPlaylist(playlist, file.getFileContent().get(i));
-            view();
-        }
-    }
-	private void addActionListeners() {
-        GUI.getPreviousButton().addActionListener(this);
-        GUI.getNextButton().addActionListener(this);
-        GUI.getRandomPlayButton().addActionListener(this);
-        GUI.getLoopButton().addActionListener(this);
-        GUI.getChooseDirectoryButton().addActionListener(this);
-        GUI.getFavouritesButton().addActionListener(this);
-        GUI.getAboutButton().addActionListener(this);
-        GUI.getSettingsButton().addActionListener(this);
-        GUI.getPlayButton().addActionListener(this);
-        GUI.getRecentButton().addActionListener(this);
-        GUI.getHelpButton().addActionListener(this);
-        GUI.getAlbumsButton().addActionListener(this);
-        GUI.getPlaylistsButton().addActionListener(this);
-        GUI.getPreviousScreenButton().addActionListener(this);
-        GUI.getNextScreenButton().addActionListener(this);
-        GUI.getSpeakerButton().addActionListener(this);
-        GUI.getSlider().addChangeListener(this);
-        GUI.getProgressBar().addMouseMotionListener(this);
-        GUI.getProgressBar().addMouseListener(this);
-        for (JButton b : buttons)
-            b.addActionListener(this);
-    }
-	@Override
-    public void mouseClicked(MouseEvent e) {
-        utils.changeCurrentTime(utils.getSongTime() * mousePossition / 425);
-        GUI.getProgressBar().setValue(mousePossition);
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-        mousePossition = e.getX();
-    }
-
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        if ((((JSlider) e.getSource()) == GUI.getSlider())) {
-            try {
-                sliderAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-        if ((((JButton) e.getSource()) == GUI.getPreviousButton())) {
-            try {
-                previousButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-
-        if ((((JButton) e.getSource()) == GUI.getNextButton())) {
-            try {
-                nextButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-        if ((((JButton) e.getSource()) == GUI.getRandomPlayButton())) {
-            try {
-                randomButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-        if ((((JButton) e.getSource()) == GUI.getLoopButton())) {
-            try {
-                loopButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-        if ((((JButton) e.getSource()) == GUI.getChooseDirectoryButton())) {
-            try {
-                folderButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-        if ((((JButton) e.getSource()) == GUI.getFavouritesButton())) {
-            try {
-                favouritesButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-        if ((((JButton) e.getSource()) == GUI.getAboutButton())) {
-            try {
-                aboutButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-        if ((((JButton) e.getSource()) == GUI.getSettingsButton())) {
-            try {
-                settingsButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-        if ((((JButton) e.getSource()) == GUI.getPlaylistsButton())) {
-            try {
-                playlistsButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-        if ((((JButton) e.getSource()) == GUI.getRecentButton())) {
-            try {
-                recentButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-        if ((((JButton) e.getSource()) == GUI.getHelpButton())) {
-            try {
-                helpButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-        if ((((JButton) e.getSource()) == GUI.getAlbumsButton())) {
-            try {
-                albumsButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-        if ((((JButton) e.getSource()) == GUI.getPlayButton())) {
-            try {
-                playButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-        if ((((JButton) e.getSource()) == GUI.getPreviousScreenButton())) {
-            try {
-                previousScreenButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-        if ((((JButton) e.getSource()) == GUI.getNextScreenButton())) {
-            try {
-                nextScreenButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-        if ((((JButton) e.getSource()) == GUI.getSpeakerButton())) {
-            try {
-                speakerButtonAction();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
-        }
-
-    }
-	private void previousButtonAction() throws Exception {
-        
-    }
-
-    private void nextButtonAction() throws Exception {
-        
-    }
-
-    private void randomButtonAction() throws Exception
-    {
-        if(isRandom)
-        {
-            isRandom = false;
-            GUI.getRandomPlayButton().setIcon(new ImageIcon("src\\project\\java\\pictures\\randomButton1.png"));
-        }
-        else
-        {
-            isRandom = true;
-            GUI.getRandomPlayButton().setIcon(new ImageIcon("src\\project\\java\\pictures\\randomButton.png"));
-        }
-    }
-
-    private void loopButtonAction() throws Exception {
-        if (!loop) {
-            loop = true;
-            utils.loop(true);
-            GUI.getLoopButton().setIcon(new ImageIcon("src\\project\\java\\pictures\\loop1Button.png"));
-        } else {
-            loop = false;
-            utils.loop(false);
-            GUI.getLoopButton().setIcon(new ImageIcon("src\\project\\java\\pictures\\loopButton.png"));
-        }
-    }
-
-    private void folderButtonAction() throws Exception {
-		JFileChooser fc = new JFileChooser();
-        fc.setDialogTitle("choosertitle");
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fc.setAcceptAllFileFilterUsed(false);
-        if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            System.out.println("getCurrentDirectory(): " + fc.getCurrentDirectory());
-            System.out.println("getSelectedFile() : " + fc.getSelectedFile());
-
-            directory = fc.getSelectedFile();
-            playlist = new Playlist();
-            files = new ArrayList<File>(Arrays.asList(directory.listFiles()));
-            ListIterator listIterator=files.listIterator();
-
-            for(File file:files)
-                playlist.loadSongs(listIterator.next().toString());
-
-            String playlistName = JOptionPane.showInputDialog("Please write playlist name!");
-            file.fileAppend(playlistName,directory.toString());
-            playlistsContainer.addPlaylist(playlist, playlistName);
-            view();
-            File plik = new File(playlistName);
-            utils.loadSong(playlistsContainer.getPlaylist(currentPlaylist).getSong( index).getFile());
-
-
-        } else {
-            System.out.println("No Selection ");
-        }
-
-    }
-
-    private void favouritesButtonAction() throws Exception {
-        
-    }
-
-    private void aboutButtonAction() throws Exception {
-       
-    }
-
-    private void settingsButtonAction() throws Exception {
-        System.out.println("Działa");
-    }
-
-    private void playlistsButtonAction() throws Exception {
-        
-    }
-
-    private void recentButtonAction() throws Exception {
-        
-    }
-
-    private void helpButtonAction() throws Exception {
-       
-    }
-
-    private void albumsButtonAction() throws Exception {
-        
-    }
-
-    private void playButtonAction() throws Exception {
-
-
-    }
-
-    private void previousScreenButtonAction() throws Exception {
-        
-    }
-
-    private void nextScreenButtonAction() throws Exception {
-
-    }
-
-    private void speakerButtonAction() throws Exception {
-        
-    }
-
-    private void sliderAction() throws Exception {
-        
-    }
-
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-
-    }
-	
-}
->>>>>>> 910152a8624b6b66e57f632b9e8b5d8606564289

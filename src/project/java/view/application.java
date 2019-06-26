@@ -93,13 +93,50 @@ public class application extends JFrame{
             frame.getContentPane().add(LogoLabel);
         }
 
+        JTextArea SearchField = new JTextArea();
+        {
+            SearchField.setBackground(UIManager.getColor("Button.background"));
+            SearchField.setBounds(new Rectangle(5, 5, 5, 5));
+            SearchField.setFont(new Font("Calibri", Font.PLAIN, 18));
+            SearchField.setText("Search...");
+            SearchField.setBounds(285, 17, 229, 25);
+            frame.getContentPane().add(SearchField);
+        }
 
+        JLabel LoopLabel = new JLabel();
+        {
+            LoopLabel.setHorizontalAlignment(SwingConstants.LEFT);
+            LoopLabel.setIcon(new ImageIcon("src\\project\\java\\pictures\\loop.png"));
+            LoopLabel.setBounds(242, 15, 30, 30);
+            frame.getContentPane().add(LoopLabel);
+        }
+
+        JLabel RecentLabel = new JLabel("New label");
+        {
+            RecentLabel.setIcon(new ImageIcon("src\\project\\java\\pictures\\25x25\\recent.png"));
+            RecentLabel.setBounds(25, 10, 25, 25);
+            frame.getContentPane().add(RecentLabel);
+        }
+
+        JLabel FavouritesLabel = new JLabel("");
+        {
+            FavouritesLabel.setIcon(new ImageIcon("src\\project\\java\\pictures\\25x25\\favorites.png"));
+            FavouritesLabel.setBounds(25, 46, 25, 25);
+            frame.getContentPane().add(FavouritesLabel);
+        }
 
         JLabel PlaylistsLabel = new JLabel("");
         {
             PlaylistsLabel.setIcon(new ImageIcon("src\\project\\java\\pictures\\25x25\\playlists.png"));
-            PlaylistsLabel.setBounds(25, 118, 25, 25);
+            PlaylistsLabel.setBounds(25, 82, 25, 25);
             frame.getContentPane().add(PlaylistsLabel);
+        }
+
+        JLabel AlbumsLabel = new JLabel("");
+        {
+            AlbumsLabel.setIcon(new ImageIcon("src\\project\\java\\pictures\\25x25\\albums.png"));
+            AlbumsLabel.setBounds(25, 118, 25, 25);
+            frame.getContentPane().add(AlbumsLabel);
         }
 
         JLabel HelpLabelIcon = new JLabel("");
@@ -116,7 +153,14 @@ public class application extends JFrame{
             frame.getContentPane().add(AboutLabelIcon);
         }
 
-        SongTitleLabel = new JLabel("Tytu≥ piosenki");
+        JLabel SettingsLabel = new JLabel("");
+        {
+            SettingsLabel.setIcon(new ImageIcon("src\\project\\java\\pictures\\25x25\\settings.png"));
+            SettingsLabel.setBounds(25, 226, 25, 25);
+            frame.getContentPane().add(SettingsLabel);
+        }
+
+        SongTitleLabel = new JLabel("Tytu≈Ç piosenki");
         {
             SongTitleLabel.setBackground(new Color(255, 255, 255));
             SongTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -184,7 +228,7 @@ public class application extends JFrame{
         {
             LoopButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             LoopButton.setIcon(new ImageIcon("src\\project\\java\\pictures\\loopButton.png"));
-       //     LoopButton.setBounds(492, 497, 45, 45);
+            LoopButton.setBounds(492, 497, 45, 45);
             frame.getContentPane().add(LoopButton);
         }
 
@@ -197,6 +241,7 @@ public class application extends JFrame{
 
         FavouritesButton = new JButton("Favourites");
         {
+            FavouritesButton.setBounds(60, 46, 140, 25);
             frame.getContentPane().add(FavouritesButton);
         }
 
@@ -208,19 +253,19 @@ public class application extends JFrame{
 
         SettingsButton = new JButton("Settings");
         {
-
+            SettingsButton.setBounds(60, 226, 140, 25);
             frame.getContentPane().add(SettingsButton);
         }
 
         PlaylistsButton = new JButton("Playlists");
         {
-            PlaylistsButton.setBounds(60, 118, 140, 25);
+            PlaylistsButton.setBounds(60, 82, 140, 25);
             frame.getContentPane().add(PlaylistsButton);
         }
 
         RecentButton = new JButton("Recent");
         {
-
+            RecentButton.setBounds(60, 10, 140, 25);
             frame.getContentPane().add(RecentButton);
         }
 
@@ -229,27 +274,10 @@ public class application extends JFrame{
             HelpButton.setBounds(60, 154, 140, 25);
             frame.getContentPane().add(HelpButton);
         }
-        LastAddedPlaylistButton = new JButton("LastAddedPlaylist");
-        {
-            HelpButton.setBounds(60, 184, 140, 25);
-            frame.getContentPane().add(HelpButton);
-        }
-        
-        favoritePlaylistButton = new JButton("favoritePlaylist");
-        {
-            HelpButton.setBounds(60, 204, 140, 25);
-            frame.getContentPane().add(HelpButton);
-        }
-        RecentPlaylistButton = new JButton("RecentPlaylist");
-        {
-            HelpButton.setBounds(60, 224, 140, 25);
-            frame.getContentPane().add(HelpButton);
-        }
-
 
         AlbumsButton = new JButton("Albums");
         {
-
+            AlbumsButton.setBounds(60, 118, 140, 25);
             frame.getContentPane().add(AlbumsButton);
         }
 
@@ -257,7 +285,6 @@ public class application extends JFrame{
         {
             previousScreenButton.setBounds(226, 440, 279, 25);
             previousScreenButton.setText("Previous Page");
-            previousScreenButton.setVisible(false);
             frame.getContentPane().add(previousScreenButton);
         }
 
@@ -265,7 +292,6 @@ public class application extends JFrame{
         {
             nextScreenButton.setBounds(505, 440, 279, 25);
             nextScreenButton.setText("Next Page");
-            nextScreenButton.setVisible(false);
             frame.getContentPane().add(nextScreenButton);
         }
 

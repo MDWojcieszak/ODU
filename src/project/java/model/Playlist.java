@@ -9,8 +9,6 @@ import java.util.List;
 
 public class Playlist {
     private List<Song> playlist;
-    private File directory;
-    private ArrayList<File> files;
     //Iterator i = playlist. index();
     // the default constructor creating a new playlist
     public Playlist() {
@@ -35,4 +33,8 @@ public class Playlist {
         return playlist.size();
     }
 
+    public void removeSong(int index)
+    {
+        playlist.remove(index);
+    }
 }

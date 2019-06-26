@@ -3,6 +3,6 @@ import java.util.ArrayList;
 
 public interface AbstractFactory<T>
 {
-    ArrayList<T> createButtons(int n);
+    ArrayList<T> createButtons(int n, int x, int width);
 }
 

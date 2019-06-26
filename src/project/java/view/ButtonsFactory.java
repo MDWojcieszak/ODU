@@ -11,16 +11,14 @@ public class ButtonsFactory implements view.AbstractFactory<JButton>
     }
 
     @Override
-    public ArrayList<JButton> createButtons(int n)
+    public ArrayList<JButton> createButtons(int n, int x, int width)
     {
-        if(n>15)
-            n=15;
         ArrayList<JButton>buttons=new ArrayList<JButton>();
         for(int i=0;i<n;i++)
         {
             JButton button = new JButton();
             button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            button.setBounds(231, 63+25*i, 549, 23);
+            button.setBounds(x, 63+25*i, width, 23);
             button.setVisible(false);
             buttons.add(button);
         }

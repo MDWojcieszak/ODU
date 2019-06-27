@@ -137,6 +137,7 @@ public class application extends JFrame{
             AlbumsLabel.setIcon(new ImageIcon("src\\project\\java\\pictures\\25x25\\albums.png"));
             AlbumsLabel.setBounds(25, 118, 25, 25);
             frame.getContentPane().add(AlbumsLabel);
+            AlbumsLabel.setVisible(false);
         }
 
         JLabel HelpLabelIcon = new JLabel("");
@@ -279,6 +280,7 @@ public class application extends JFrame{
         {
             AlbumsButton.setBounds(60, 118, 140, 25);
             frame.getContentPane().add(AlbumsButton);
+            AlbumsButton.setVisible(false);
         }
 
         previousScreenButton = new JButton();

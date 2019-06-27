@@ -68,23 +68,46 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
 
 
         this.addActionListeners();
-        load_player("H:\\JAVA\\OdtwarzaczDlaUbogich\\arrival.mp3");
+        load_player("H:\\JAVA\\ss.mp3");
         Thread thread = new Thread()
         {
             public void run() {
-                int previous = -1;
+                String previous = utils.getFileName();
                 while (true)
                 {
-                    if(index != previous)
-
-                        if(recent.getCount()>15)
+                    if(utils.getFileName() != previous) {
+                        System.out.println("working");
+                        previous = utils.getFileName();
+                        for(int j = 0; j<recent.getCount(); j++)
                         {
+                            if(recent.getSong(j).getFile() == previous)
+                                recent.removeSong(j);
 
                         }
-                        else
-                        {
-
+                        ArrayList<String> temp = new ArrayList();
+                        if (recent.getCount() > 13) {
+                            temp.add(previous);
+                            for (int i = 0; i < 14; i++) {
+                                temp.add(recent.getSong(i).getFile());
+                            }
+                            recent.removeAll();
+                            for(int i=0 ; i<temp.size();i++)
+                            {
+                                recent.loadSongs(temp.get(i));
+                            }
+                        } else {
+                            temp.add(previous);
+                            for(int i=0;i< recent.getCount();i++)
+                            {
+                                temp.add(recent.getSong(i).getFile());
+                            }
+                            recent.removeAll();
+                            for(int i=0 ; i<temp.size();i++)
+                            {
+                                recent.loadSongs(temp.get(i));
+                            }
                         }
+                    }
                     if(isPlaying && !loop)
                     {
                         if(utils.getCurrentTime() == utils.getSongTime())
@@ -97,6 +120,20 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
                                 e.printStackTrace();
                             }
                         }
+                    }
+                    if(isPlaying && loop)
+                    {
+                        if(utils.getCurrentTime() == utils.getSongTime())
+                        {
+                            utils.loop(true);
+                            try {
+                                playButtonAction();
+                                playButtonAction();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                     }
                 }
             }
@@ -326,14 +363,19 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
         switch (view)
         {
             case "RecentView":
-                for (int i = 0; i <15; i++) {
+                for (int i = 0; i <recent.getCount(); i++) {
                     buttons.get(i).setVisible(true);
                     buttons.get(i).setText(getSongnameFromPath(
                             recent.getSong(i+card*15).getFile()));
-                    likeButtons.get(i).setVisible(false);
+                    likeButtons.get(i).setVisible(true);
                     GUI.getPreviousScreenButton().setVisible(false);
                     GUI.getNextScreenButton().setVisible(false);
                 }
+                for(int i=14;i>=recent.getCount(); i--) {
+                    buttons.get(i).setVisible(false);
+                    likeButtons.get(i).setVisible(false);
+                }
+
                 break;
             case "FavoritesView":
                 if (favorite.getCount() / 15 > 0)
@@ -463,7 +505,7 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
         }
     }
 
-    String getSongnameFromPath(String path) {
+    public String getSongnameFromPath(String path) {
         int slashIndex = path.lastIndexOf('\\');
         int extIndex = path.lastIndexOf('.');
 
@@ -481,11 +523,19 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
 
     private void mainFrameButtonAction(int button) throws Exception {
         if (RecentView) {
-
+            int currentPlaylistTemp = currentPlaylist;
+            currentPlaylist = 1;
+            index = button;
+            if (isPlaying) {
+                playButtonAction();
+            }
+            utils.loadSong(recent.getSong(index).getFile());
+            if (!isPlaying) playButtonAction();
+            view("RecentView");
+            currentPlaylist = currentPlaylistTemp;
         } else if (FavouritesView) {
             currentPlaylist = 0;
             index = button + card * 15;
-            System.out.println( index);
             if (isPlaying) {
                 playButtonAction();
             }
@@ -495,8 +545,7 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
         } else if (PlaylistsView) {
             PlaylistsSongView = true;
             if (chooseTrack) {
-                 index = button + card * 15;
-                System.out.println( index);
+                 index = button + card * 15;;
                 if (isPlaying) {
                     playButtonAction();
                 }
@@ -680,7 +729,9 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
     private void favouritesButtonAction() throws Exception {
         card = 0;
         FavouritesView = true;
+        PlaylistsSongView = false;
         PlaylistsView = false;
+        RecentView = false;
         view("FavoritesView");
     }
 
@@ -696,12 +747,16 @@ public class Controller implements ActionListener, ChangeListener, MouseMotionLi
         FavouritesView = false;
         PlaylistsSongView = false;
         PlaylistsView = true;
+        RecentView = false;
         view("PlaylistsView");
     }
 
     private void recentButtonAction() throws Exception {
-        if(RecentView) RecentView = false;
-        else RecentView = true;
+        card =0;
+        FavouritesView = false;
+        PlaylistsSongView = false;
+        PlaylistsView = false;
+        RecentView = true;
         view("RecentView");
     }
 

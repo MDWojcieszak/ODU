@@ -37,4 +37,8 @@ public class Playlist {
     {
         playlist.remove(index);
     }
+    public void removeAll()
+    {
+        playlist.clear();
+    }
 }

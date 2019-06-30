@@ -1,7 +1,11 @@
 package java;
-import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.openpojo.reflection.impl.PojoClassFactory;
+import com.openpojo.validation.Validator;
+import com.openpojo.validation.ValidatorBuilder;
+import com.openpojo.validation.test.impl.GetterTester;
+import com.openpojo.validation.test.impl.SetterTester;
+
 public class ProjoTestUtils
 {
 

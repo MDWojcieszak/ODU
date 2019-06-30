@@ -1,17 +1,11 @@
-package java.model;
+package view;
 
-import model.Playlist;
-import model.PlaylistsContainer;
-import model.Song;
-import org.junit.jupiter.api.Test;
-import view.ButtonsFactory;
+import java.ProjoTestUtils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+class ButtonsFactoryTest {
 
-public class ButtonsFactoryTest {
-
-    @Test
     public void testPlaylist() {
-        PojoTestUtils.validateAccessors(ButtonsFactory.class);
+        ProjoTestUtils.validateAccessors(ButtonsFactory.class);
     }
+
 }
